@@ -60,7 +60,7 @@ class HamburgerMenu extends StatelessWidget {
                 const SizedBox(width: 16),
                 Expanded(
                   child: Text(
-                    isLoggedIn ? (username ?? "User") : "MovieFlix",
+                    isLoggedIn ? (username ?? "User") : "Guest",
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       color: Colors.white,
@@ -74,74 +74,91 @@ class HamburgerMenu extends StatelessWidget {
           ),
 
           // LOGIN / LOGOUT
-          ListTile(
-            leading: Icon(
-              isLoggedIn ? Icons.logout : Icons.login,
-              color: Colors.white,
-            ),
-            title: Text(
-              isLoggedIn ? "Logout" : "Login",
-              style: const TextStyle(color: Colors.white),
-            ),
-            onTap: () {
-              Navigator.pop(context);
-              if (onLoginLogout != null) onLoginLogout!();
-            },
-          ),
-
-          const Divider(color: Colors.white24),
-
-          // 📂 BROWSE SECTION
-          _drawerItem(context, Icons.home, "Home", onHome),
-          _drawerItem(
-            context,
-            Icons.local_fire_department,
-            "Top Movies",
-            onTop,
-          ),
-
-          // 🛠️ ADMIN SECTION (Only visible if role is admin)
-          if (role != 'admin') ...[
-            // Milod Change here , this is for testing purpose
-            const Padding(
-              padding: EdgeInsets.only(left: 16, top: 20, bottom: 8),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "ADMIN DASHBOARD",
-                  style: TextStyle(
-                    color: Colors.redAccent,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1.2,
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  // LOGIN / LOGOUT
+                  ListTile(
+                    leading: Icon(
+                      isLoggedIn ? Icons.logout : Icons.login,
+                      color: Colors.white,
+                    ),
+                    title: Text(
+                      isLoggedIn ? "Logout" : "Login",
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                    onTap: () {
+                      Navigator.pop(context);
+                      if (onLoginLogout != null) onLoginLogout!();
+                    },
                   ),
-                ),
+                  const Divider(color: Colors.white24),
+
+                  // BROWSE SECTION
+                  _drawerItem(context, Icons.home, "Home", onHome),
+                  _drawerItem(
+                    context,
+                    Icons.local_fire_department,
+                    "Top Movies",
+                    onTop,
+                  ),
+
+                  // ADMIN SECTION
+                  if (role == 'admin') ...[
+                    const Padding(
+                      padding: EdgeInsets.only(left: 16, top: 20, bottom: 8),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          "ADMIN DASHBOARD",
+                          style: TextStyle(
+                            color: Colors.redAccent,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.2,
+                          ),
+                        ),
+                      ),
+                    ),
+                    _drawerItem(
+                      context,
+                      Icons.post_add,
+                      "Add New Movie",
+                      onAddMovie,
+                    ),
+                    _drawerItem(
+                      context,
+                      Icons.edit_note,
+                      "Manage Movies",
+                      onManageMovies,
+                    ),
+                    _drawerItem(
+                      context,
+                      Icons.people_outline,
+                      "Manage Users",
+                      onManageUsers,
+                    ),
+                    const Divider(color: Colors.white24),
+                  ],
+
+                  // GENRES SECTION
+                  _drawerItem(context, Icons.flash_on, "Action", onAction),
+                  _drawerItem(
+                    context,
+                    Icons.emoji_emotions,
+                    "Comedy",
+                    onComedy,
+                  ),
+                  _drawerItem(context, Icons.theater_comedy, "Drama", onDrama),
+                ],
               ),
             ),
-            _drawerItem(context, Icons.post_add, "Add New Movie", onAddMovie),
-            _drawerItem(
-              context,
-              Icons.edit_note,
-              "Manage Movies",
-              onManageMovies,
-            ),
-            _drawerItem(
-              context,
-              Icons.people_outline,
-              "Manage Users",
-              onManageUsers,
-            ),
-            const Divider(color: Colors.white24),
-          ],
+          ),
 
-          // 📂 GENRES SECTION
-          _drawerItem(context, Icons.flash_on, "Action", onAction),
-          _drawerItem(context, Icons.emoji_emotions, "Comedy", onComedy),
-          _drawerItem(context, Icons.theater_comedy, "Drama", onDrama),
-
-          const Spacer(),
+          // BOTTOM SECTION (Stays fixed at the bottom)
           const Divider(color: Colors.white24),
-
           _drawerItem(context, Icons.settings, "Settings", onSettings),
+          const SizedBox(height: 10),
         ],
       ),
     );

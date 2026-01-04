@@ -1,38 +1,40 @@
 <?php
 header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type");
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
 header("Content-Type: application/json");
 require_once "../config/database.php";
+
+$category = $_GET['category'] ?? '';
+$excludeId = (int)($_GET['exclude_id'] ?? 0);
+
 $sql = "
 SELECT 
-    m.id,
-    m.title,
-    m.description,
-    COALESCE((SELECT AVG(rating) FROM ratings WHERE movie_id = m.id), 0) as avg_rating,
-    m.category,
+    m.id, 
+    m.title, 
+    m.description, 
+    m.category, 
     m.cover,
-    GROUP_CONCAT(mi.image_url) AS images
-    
+    GROUP_CONCAT(mi.image_url) AS images,
+    COALESCE((SELECT AVG(rating) FROM ratings WHERE movie_id = m.id), 0) as rating,
+    COALESCE((SELECT COUNT(*) FROM ratings WHERE movie_id = m.id), 0) as votes
 FROM movies m
 LEFT JOIN movie_images mi ON m.id = mi.movie_id
+WHERE m.category = ? AND m.id != ?
 GROUP BY m.id
+ORDER BY rating DESC
+LIMIT 6
 ";
 
 $stmt = $pdo->prepare($sql);
-$stmt->execute();
+$stmt->execute([$category, $excludeId]);
 
 $movies = [];
-
 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
     $movies[] = [
         "id" => (int)$row["id"],
         "title" => $row["title"],
         "description" => $row["description"],
-        "rating" => round((float)$row["avg_rating"], 1),
+        "rating" => (float)$row["rating"],
+        "votes" => (int)$row["votes"],
         "category" => $row["category"],
         "cover" => $row["cover"],
         "images" => $row["images"] ? explode(",", $row["images"]) : []

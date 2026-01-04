@@ -16,19 +16,20 @@ if (!isset($_GET["id"])) {
 
 $movieId = (int)$_GET["id"];
 
-$sql = `
+$sql = "
 SELECT 
     m.id,
     m.title,
     m.description,
-    m.rating,
+    (SELECT AVG(rating) FROM ratings WHERE movie_id = m.id) as avg_rating,
+    (SELECT COUNT(*) FROM ratings WHERE movie_id = m.id) as total_votes,
     m.category,
     m.cover,
     mi.image_url
 FROM movies m
 LEFT JOIN movie_images mi ON m.id = mi.movie_id
 WHERE m.id = ?
-`;
+";
 
 $stmt = $pdo->prepare($sql);
 $stmt->execute([$movieId]);
@@ -42,7 +43,8 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             "id" => (int)$row["id"],
             "title" => $row["title"],
             "description" => $row["description"],
-            "rating" => (float)$row["rating"],
+            "rating" => round((float)($row["avg_rating"] ?? 0), 1),
+            "votes" => (int)$row["total_votes"],
             "category" => $row["category"],
             "cover" => $row["cover"],
             "images" => []

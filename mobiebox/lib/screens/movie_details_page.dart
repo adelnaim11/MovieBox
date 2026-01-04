@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import '../models/movie.dart';
 import '../services/api_service.dart';
+import 'watch_movie_page.dart';
 
 class MovieDetailsPage extends StatefulWidget {
   final Movie movie;
-  final int? userId; // logged-in user
-  final String? role; // 'user' or 'admin'
+  final int? userId;
+  final String? role;
 
   const MovieDetailsPage({
     super.key,
     required this.movie,
-    this.userId,
-    this.role,
+    required this.userId,
+    required this.role,
   });
 
   @override
@@ -19,12 +20,36 @@ class MovieDetailsPage extends StatefulWidget {
 }
 
 class _MovieDetailsPageState extends State<MovieDetailsPage> {
-  int _currentRating = 0;
+  double _currentRating = 0;
+  late Movie _movieDetails;
 
   @override
   void initState() {
     super.initState();
-    // Optionally, fetch current rating from backend here
+    _movieDetails = widget.movie;
+    _loadInitialData();
+  }
+
+  Future<void> _loadInitialData() async {
+    // Fetch user's personal rating and global movie details in parallel
+    await Future.wait([_loadUserRating(), _refreshMovieData()]);
+  }
+
+  Future<void> _refreshMovieData() async {
+    final updatedMovie = await ApiService.fetchMovieDetails(widget.movie.id);
+    setState(() {
+      _movieDetails = updatedMovie;
+    });
+  }
+
+  Future<void> _loadUserRating() async {
+    if (widget.userId != null) {
+      final rating = await ApiService.getUserRating(
+        widget.userId!,
+        widget.movie.id,
+      );
+      setState(() => _currentRating = rating);
+    }
   }
 
   @override
@@ -99,13 +124,16 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
                           ),
                         ),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 6,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.amber.withOpacity(0.15),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
-                            "⭐ ${widget.movie.rating}",
+                            "⭐ ${_movieDetails.rating} (${_movieDetails.votes})",
                             style: const TextStyle(
                               color: Colors.amber,
                               fontWeight: FontWeight.bold,
@@ -130,18 +158,23 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
                     // 🌟 USER RATING
                     if (widget.userId != null && widget.role == 'user') ...[
                       const SizedBox(height: 20),
-                      const Text("Rate this movie:", style: TextStyle(color: Colors.white, fontSize: 16)),
+                      const Text(
+                        "Rate this movie:",
+                        style: TextStyle(color: Colors.white, fontSize: 16),
+                      ),
                       const SizedBox(height: 10),
                       Row(
                         children: List.generate(5, (index) {
                           return IconButton(
                             icon: Icon(
-                              index < _currentRating ? Icons.star : Icons.star_border,
+                              index < _currentRating
+                                  ? Icons.star
+                                  : Icons.star_border,
                               color: Colors.amber,
                             ),
                             onPressed: () async {
                               setState(() {
-                                _currentRating = index + 1;
+                                _currentRating = (index + 1).toDouble();
                               });
                               try {
                                 await ApiService.rateMovie(
@@ -149,12 +182,18 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
                                   widget.movie.id,
                                   _currentRating.toDouble(),
                                 );
+                                await _refreshMovieData();
+
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text("Rating submitted!")),
+                                  const SnackBar(
+                                    content: Text("Rating submitted!"),
+                                  ),
                                 );
                               } catch (_) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text("Failed to submit rating")),
+                                  const SnackBar(
+                                    content: Text("Failed to submit rating"),
+                                  ),
                                 );
                               }
                             },
@@ -169,7 +208,15 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
                     SizedBox(
                       height: 55,
                       child: ElevatedButton.icon(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  WatchMoviePage(movie: _movieDetails),
+                            ),
+                          );
+                        },
                         icon: const Icon(Icons.play_arrow),
                         label: const Text(
                           "Watch Now",

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 02, 2026 at 08:27 PM
+-- Generation Time: Jan 04, 2026 at 02:48 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -120,6 +120,13 @@ CREATE TABLE `ratings` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `ratings`
+--
+
+INSERT INTO `ratings` (`id`, `user_id`, `movie_id`, `rating`, `created_at`) VALUES
+(1, 2, 12, 5.0, '2026-01-04 13:06:24');
+
 -- --------------------------------------------------------
 
 --
@@ -132,6 +139,14 @@ CREATE TABLE `users` (
   `password` varchar(255) NOT NULL,
   `role` enum('user','admin') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES
+(1, 'testmiloud', '$2y$10$vka8R3J8nGAcSx3Az9/EAOMhaNigWDo/nMmyqQsQKKd/7pptUR5T2', 'admin'),
+(2, 'testmiloud2', '$2y$10$8iUzBWAabhM1Es40mZZV5.CboYWtIJY5aOBN3xCr1iNCkq.B/3Zn2', 'user');
 
 --
 -- Indexes for dumped tables
@@ -155,6 +170,7 @@ ALTER TABLE `movie_images`
 --
 ALTER TABLE `ratings`
   ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_user_movie` (`user_id`,`movie_id`),
   ADD KEY `user_id` (`user_id`),
   ADD KEY `movie_id` (`movie_id`);
 
@@ -185,13 +201,13 @@ ALTER TABLE `movie_images`
 -- AUTO_INCREMENT for table `ratings`
 --
 ALTER TABLE `ratings`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- Constraints for dumped tables

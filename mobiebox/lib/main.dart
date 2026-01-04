@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:mobiebox/screens/Authpage.dart';
 import 'dart:convert';
+import 'dart:ui';
 
 import 'screens/home_page.dart';
 // import 'screens/login_page.dart'; // Create this file and move the LoginPage there later
@@ -17,6 +18,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      scrollBehavior: MyCustomScrollBehavior(),
       title: 'MovieFlix',
       // Ensure your AppTheme is correctly defined in theme/app_theme.dart
       // theme: AppTheme.darkTheme,
@@ -29,4 +31,12 @@ class MyApp extends StatelessWidget {
       },
     );
   }
+}
+
+class MyCustomScrollBehavior extends MaterialScrollBehavior {
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+        PointerDeviceKind.touch,
+        PointerDeviceKind.mouse,
+      };
 }

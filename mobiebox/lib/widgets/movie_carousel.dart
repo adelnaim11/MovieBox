@@ -6,10 +6,19 @@ import 'package:flutter/services.dart';
 import '../models/movie.dart';
 import '../screens/movie_details_page.dart';
 
+
+
 class MovieCarousel extends StatefulWidget {
   final List<Movie> movies;
+  final int? userId;
+  final String? role;
 
-  const MovieCarousel({super.key, required this.movies});
+  const MovieCarousel({
+    super.key,
+    required this.movies,
+    this.userId,
+    this.role,
+  });
 
   @override
   State<MovieCarousel> createState() => _MovieCarouselState();
@@ -70,6 +79,7 @@ class _MovieCarouselState extends State<MovieCarousel> {
           PageView.builder(
             controller: _controller,
             itemCount: widget.movies.length,
+            physics: const BouncingScrollPhysics(),
             onPageChanged: (index) {
               HapticFeedback.lightImpact();
               setState(() => _currentIndex = index);
@@ -85,11 +95,17 @@ class _MovieCarouselState extends State<MovieCarousel> {
                   if (_controller.position.haveDimensions) {
                     value = _controller.page! - index;
                     value = (1 - value.abs() * 0.25).clamp(0.85, 1.0);
+                  } else {
+                    value = index == _currentIndex ? 1.0 : 0.8;
                   }
 
                   return Transform.scale(scale: value, child: child);
                 },
-                child: _MovieCard(movie: movie),
+                child: _MovieCard(
+                  movie: movie,
+                  userId: widget.userId,
+                  role: widget.role,
+                ),
               );
             },
           ),
@@ -126,15 +142,19 @@ class _MovieCarouselState extends State<MovieCarousel> {
 
 class _MovieCard extends StatelessWidget {
   final Movie movie;
+  final int? userId; // Add this
+  final String? role; // Add this
 
-  const _MovieCard({required this.movie});
-
+  const _MovieCard({required this.movie, this.userId, this.role});
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => Navigator.push(
         context,
-        MaterialPageRoute(builder: (_) => MovieDetailsPage(movie: movie)),
+        MaterialPageRoute(
+          builder: (_) =>
+              MovieDetailsPage(movie: movie, userId: userId, role: role),
+        ),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 18),
@@ -148,6 +168,7 @@ class _MovieCard extends StatelessWidget {
                   movie.cover,
                   fit: BoxFit.cover,
                   alignment: Alignment.topCenter,
+                  filterQuality: FilterQuality.high,
                 ),
               ),
 

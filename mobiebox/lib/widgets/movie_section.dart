@@ -5,8 +5,16 @@ import '../screens/movie_details_page.dart';
 class MovieSection extends StatelessWidget {
   final String title;
   final List<Movie> movies;
+  final int? userId;
+  final String? role;
 
-  const MovieSection(this.title, this.movies, {super.key});
+  const MovieSection(
+    this.title,
+    this.movies,
+    this.userId,
+    this.role, {
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +46,11 @@ class MovieSection extends StatelessWidget {
                 onTap: () => Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => MovieDetailsPage(movie: movie),
+                    builder: (_) => MovieDetailsPage(
+                      movie: movie,
+                      userId: userId, // Pass directly
+                      role: role, // Pass directly
+                    ),
                   ),
                 ),
                 child: Container(

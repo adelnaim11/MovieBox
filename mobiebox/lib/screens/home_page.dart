@@ -20,6 +20,7 @@ class _HomePageState extends State<HomePage> {
 
   // --- State Variables for Authentication ---
   bool userIsAuthenticated = false;
+  int? currentUserId;
   String? currentUsername;
   String? userRole = 'user'; // Change to 'admin' to test admin features
 
@@ -70,14 +71,26 @@ class _HomePageState extends State<HomePage> {
             (_) => setState(() => _loadMovies()),
           ); // Refresh after deleting
         },
-        onLoginLogout: () {
-          setState(() {
-            userIsAuthenticated = false;
-            currentUsername = null;
-          });
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Logged out successfully")),
-          );
+        onLoginLogout: () async {
+          if (userIsAuthenticated) {
+            setState(() {
+              userIsAuthenticated = false;
+              currentUsername = null;
+              currentUserId = null;
+              userRole = 'user';
+            });
+          } else {
+            // Navigate to login and wait for the result
+            final result = await Navigator.pushNamed(context, '/login');
+            if (result != null && result is Map) {
+              setState(() {
+                userIsAuthenticated = true;
+                currentUsername = result['username'];
+                userRole = result['role'];
+                currentUserId = result['id'];
+              });
+            }
+          }
         },
         onSettings: () {
           ScaffoldMessenger.of(
@@ -135,19 +148,43 @@ class _HomePageState extends State<HomePage> {
             child: ListView(
               children: [
                 if (carouselMovies.isNotEmpty)
-                  MovieCarousel(movies: carouselMovies),
+                  MovieCarousel(
+                    movies: carouselMovies,
+                    userId: currentUserId,
+                    role: userRole,
+                  ),
 
                 if (_filterCategory == "All" || _filterCategory == "Top")
-                  MovieSection("🔥 Top Movies", getByCategory("Top")),
+                  MovieSection(
+                    "🔥 Top Movies",
+                    getByCategory("Top"),
+                    currentUserId,
+                    userRole,
+                  ),
 
                 if (_filterCategory == "All" || _filterCategory == "Action")
-                  MovieSection("💥 Action", getByCategory("Action")),
+                  MovieSection(
+                    "💥 Action",
+                    getByCategory("Action"),
+                    currentUserId,
+                    userRole,
+                  ),
 
                 if (_filterCategory == "All" || _filterCategory == "Comedy")
-                  MovieSection("😂 Comedy", getByCategory("Comedy")),
+                  MovieSection(
+                    "😂 Comedy",
+                    getByCategory("Comedy"),
+                    currentUserId,
+                    userRole,
+                  ),
 
                 if (_filterCategory == "All" || _filterCategory == "Drama")
-                  MovieSection("🎭 Drama", getByCategory("Drama")),
+                  MovieSection(
+                    "🎭 Drama",
+                    getByCategory("Drama"),
+                    currentUserId,
+                    userRole,
+                  ),
               ],
             ),
           );

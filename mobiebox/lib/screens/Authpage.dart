@@ -36,6 +36,7 @@ class _AuthPageState extends State<AuthPage> {
       if (data['success'] == true) {
         if (isLogin) {
           Navigator.pop(context, {
+            'id': data['id'],
             'username': data['username'],
             'role': data['role'],
           });
@@ -71,65 +72,97 @@ class _AuthPageState extends State<AuthPage> {
             colors: [Colors.black, Color(0xFF1a1a1a), Color(0xFF330000)],
           ),
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(30),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // 🎥 Logo or Icon
-              const Icon(Icons.movie_filter, size: 80, color: Colors.redAccent),
-              const SizedBox(height: 10),
-              Text(
-                isLogin ? "Welcome Back" : "Create Account",
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
+        child: Stack(
+          children: [
+            // 🔙 BACK BUTTON
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.only(left: 10, top: 10),
+                child: IconButton(
+                  icon: const Icon(
+                    Icons.arrow_back_ios_new,
+                    color: Colors.white,
+                  ),
+                  onPressed: () => Navigator.pop(context),
                 ),
               ),
-              const SizedBox(height: 40),
+            ),
 
-              // Glassmorphic Input Field Container
-              _buildTextField(_userController, "Username", Icons.person, false),
-              const SizedBox(height: 15),
-              _buildTextField(_passController, "Password", Icons.lock, true),
-
-              const SizedBox(height: 30),
-
-              _isLoading
-                  ? const CircularProgressIndicator(color: Colors.redAccent)
-                  : SizedBox(
-                      width: double.infinity,
-                      height: 55,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.redAccent,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                        ),
-                        onPressed: _handleAuth,
-                        child: Text(
-                          isLogin ? "LOGIN" : "SIGN UP",
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
+            Padding(
+              padding: const EdgeInsets.all(30),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // 🎥 Logo or Icon
+                  const Icon(
+                    Icons.movie_filter,
+                    size: 80,
+                    color: Colors.redAccent,
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    isLogin ? "Welcome Back" : "Create Account",
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
                     ),
+                  ),
+                  const SizedBox(height: 40),
 
-              TextButton(
-                onPressed: () => setState(() => isLogin = !isLogin),
-                child: Text(
-                  isLogin
-                      ? "Don't have an account? Sign Up"
-                      : "Already have an account? Login",
-                  style: const TextStyle(color: Colors.white70),
-                ),
+                  // Glassmorphic Input Field Container
+                  _buildTextField(
+                    _userController,
+                    "Username",
+                    Icons.person,
+                    false,
+                  ),
+                  const SizedBox(height: 15),
+                  _buildTextField(
+                    _passController,
+                    "Password",
+                    Icons.lock,
+                    true,
+                  ),
+
+                  const SizedBox(height: 30),
+
+                  _isLoading
+                      ? const CircularProgressIndicator(color: Colors.redAccent)
+                      : SizedBox(
+                          width: double.infinity,
+                          height: 55,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.redAccent,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                            ),
+                            onPressed: _handleAuth,
+                            child: Text(
+                              isLogin ? "LOGIN" : "SIGN UP",
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+
+                  TextButton(
+                    onPressed: () => setState(() => isLogin = !isLogin),
+                    child: Text(
+                      isLogin
+                          ? "Don't have an account? Sign Up"
+                          : "Already have an account? Login",
+                      style: const TextStyle(color: Colors.white70),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

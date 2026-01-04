@@ -14,22 +14,28 @@ if (!$data || !isset($data->username) || !isset($data->password)) {
 $username = trim($data->username);
 $password = $data->password;
 
-$stmt = $conn->prepare("SELECT id, username, password, role FROM users WHERE username = ?");
-$stmt->bind_param("s", $username);
-$stmt->execute();
-$result = $stmt->get_result();
+try {
+    $stmt = $pdo->prepare("SELECT id, username, password, role FROM users WHERE username = :username");
+    $stmt->execute([':username' => $username]);
+    
+    $user = $stmt->fetch();
 
-if($row = $result->fetch_assoc()){
-    if(password_verify($password, $row['password'])){
-        echo json_encode([
-            "success" => true,
-            "user_id" => $row['id'],
-            "role" => $row['role'],
-            "username" => $row['username']
-        ]);
+    if ($user) {
+        if (password_verify($password, $user['password'])) {
+            echo json_encode([
+                "success" => true,
+                "id" => (int)$user['id'],
+                "role" => $user['role'],
+                "username" => $user['username']
+            ]);
+        } else {
+            echo json_encode(["success" => false, "message" => "Incorrect password"]);
+        }
     } else {
-        echo json_encode(["success" => false, "message" => "Incorrect password"]);
+        echo json_encode(["success" => false, "message" => "Username does not exist"]);
     }
-} else {
-    echo json_encode(["success" => false, "message" => "Username does not exist"]);
+
+} catch (PDOException $e) {
+    echo json_encode(["success" => false, "message" => "Database error: " . $e->getMessage()]);
 }
+?>
