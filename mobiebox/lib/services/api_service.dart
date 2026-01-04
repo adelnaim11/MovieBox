@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import '../models/movie.dart';
 
 class ApiService {
-  static const String baseUrl = "http://localhost/movies_backend/api";
+  static const String baseUrl = "../api";
 
   static Future<List<Movie>> fetchSimilarMovies(
     String category,
