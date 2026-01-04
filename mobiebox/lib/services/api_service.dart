@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import '../models/movie.dart';
 
 class ApiService {
-  static const String baseUrl = "../api";
+  static const String baseUrl = "https://moviebox-3g8b.onrender.com";
 
   static Future<List<Movie>> fetchSimilarMovies(
     String category,
