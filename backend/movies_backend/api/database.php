@@ -10,9 +10,9 @@ $port = getenv('MYSQLPORT');
 
 try {
     $options = [
-        PDO::MYSQL_ATTR_SSL_CA => true,
+        PDO::MYSQL_ATTR_SSL_CA => __DIR__ . '/isrgrootx1.pem',
+        PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false, // Prevents hostname mismatch errors
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
     ];
 
     $pdo = new PDO(
