@@ -83793,7 +83793,7 @@ A.Cb.prototype={
 wK(){var s=0,r=A.N(t.H),q=1,p=[],o=[],n=this,m,l,k,j,i,h,g,f
 var $async$wK=A.O(function(a,b){if(a===1){p.push(b)
 s=q}while(true)switch(s){case 0:n.a9(new A.agl(n))
-m=A.dZ("http://localhost/movies_backend/api/"+(n.d?"login.php":"signup.php"))
+m=A.dZ("https://moviebox-3g8b.onrender.com/"+(n.d?"login.php":"signup.php"))
 q=3
 i=t.N
 s=6
